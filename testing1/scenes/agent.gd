@@ -45,8 +45,9 @@ func _on_timer_timeout():
 		destination=workplace_coords*16
 	else:
 		destination=domicile_coords*16
-	print("[*]destination of "+str(id)+": "+str(destination))
-	print("[*]domicile of "+str(id)+": "+str(domicile_coords))
+	#debug to check the coords of workplace
+	#print("[*]destination of "+str(id)+": "+str(destination))
+	#print("[*]domicile of "+str(id)+": "+str(domicile_coords))
 	
 	make_path(destination)
 func define_domicile(houses_table):
@@ -58,6 +59,7 @@ func define_domicile(houses_table):
 			domicile_coords=houses_table[i]["coords"]
 			print(domicile_coords)
 			return 0
+
 func define_workplace(workplace_table):
 	for i in range(workplace_table.size()):
 		if workplace_table[i]["employees"].size()<5:
@@ -66,6 +68,16 @@ func define_workplace(workplace_table):
 			workplace=workplace_table[i]["id"]
 			workplace_coords=workplace_table[i]["coords"]
 			return 0
+			
+func update_workplace(workplace_table):
+	if workplace_coords==Vector2(0,0) or manager.get_element_index(domicile,workplace_table)==-1:#if no workplace or worplace deleted
+		print("new work")
+		define_workplace(workplace_table)
+func update_domicile(houses_table):
+	if domicile_coords==Vector2(0,0) or manager.get_element_index(domicile,houses_table)==-1:
+		define_domicile(houses_table)
+
+	
 func _ready():
 	define_domicile(manager.houses)
 	define_workplace(manager.workplaces)

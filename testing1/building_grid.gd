@@ -22,6 +22,26 @@ var mouse_tile_map_pos=Vector2(0,0)
 #is building path inverted
 var invert_build_path=false
 
+
+
+
+#
+func delete_building(coords,layout):
+	var element=layout[coords.x][coords.y]
+	if element["type"]=="house" or element["type"]=="house":
+		manager.remove_building(element["type"],element["id"])
+	layout[coords.x][coords.y]={
+				"type":"grass",
+				"facing":"east",
+				"variant":randi_range(0,3),
+				"id":0,
+				"connections":"none"
+	}
+	
+		
+	
+
+
 #path to build road
 var road_begin=Vector2(0,0)
 var road_end=Vector2(0,0)
@@ -30,7 +50,7 @@ func update_grid(layout):
 		var situation=get_connections(layout,house["coords"])
 		layout[house["coords"].x][house["coords"].y]={
 			"type":"house",
-			"id":0,
+			"id":house["id"],
 			"facing":situation[1],
 			"connections":situation[0]
 		}
@@ -141,7 +161,7 @@ func get_connections(layout,coords:Vector2,type:="road"):#returns the road situa
 					connections="none"
 					facing="east"
 	return [connections,facing]
-				
+		
 func place_road(coords:Vector2,layout,depth:=1):
 	var situation=get_connections(layout,coords)
 	var connections=situation[0]

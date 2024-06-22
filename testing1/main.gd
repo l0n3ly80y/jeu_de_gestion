@@ -33,10 +33,12 @@ var basic_house={"id":0,
 "inhabitants":[],
 "rent":0}
 func generate_id(table):#returns a suitable id for a new element in a table
-	var maximum_id=1
+	var maximum_id=0
 	for element in table:
-		if element["id"]>maximum_id:
+
+		if element["id"]>=maximum_id:
 			maximum_id=element["id"]+1
+	print(maximum_id)
 	return maximum_id
 
 func create_house(coords:Vector2,table,layout):
@@ -111,6 +113,9 @@ func _input(event):
 				create_agent(building_grid.mouse_tile_map_pos,agents)
 			elif cursor_state=="building_factory":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces)
+			elif cursor_state=="delete_building":
+				pass
+				cursor_state="none"
 				
 	elif event is InputEventKey:
 		if event.pressed and event.keycode==KEY_I:
@@ -121,7 +126,9 @@ func _input(event):
 
 
 
-
+func remove_building(type:String,id:int):
+	if type=="house":
+		houses
 
 func _on_road_button_pressed():
 	if cursor_state=="none":		
@@ -151,9 +158,15 @@ func _on_spawn_agent_button_pressed():
 
 func _on_build_factory_pressed():
 	cursor_state="building_factory"
+	
+func _on_delete_button_pressed():
+	cursor_state="delete_building"
+	
+
 func _on_timer_timeout():
 	date["hour"]+=1
 	if date["hour"]>=24:
+		update_day_state()
 		date["hour"]=0
 		date["day"]+=1
 		if date["weekday"]<6:
@@ -168,5 +181,15 @@ func _on_timer_timeout():
 				date["year"]+=1
 	date_label.text=get_date_string(date)
 
+func update_day_state():
+	for agent in agents:
+		agent["object"].update_workplace(workplaces)
+		agent["object"].update_domicile(houses)
+		
+func get_element_index(id:int,table):
+	for element_index in table.size():
+		if table[element_index]["id"]==id:
+			return element_index
+	return -1
 
 

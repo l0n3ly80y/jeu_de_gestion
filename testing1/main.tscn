@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://e7cktgqivg0u"]
+[gd_scene load_steps=34 format=3 uid="uid://e7cktgqivg0u"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_l5bp7"]
 [ext_resource type="Texture2D" uid="uid://snee3gif3iyu" path="res://tiles/2dPaths.png" id="1_n4iox"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" path="res://building_grid.gd" id="2_f5x7o"]
 [ext_resource type="Texture2D" uid="uid://brqjepr6ratj1" path="res://tiles/grass.png" id="2_ne0bm"]
 [ext_resource type="Texture2D" uid="uid://bd8renqsn71e" path="res://tiles/preview.png" id="5_h810y"]
-[ext_resource type="PackedScene" uid="uid://bckba7mvckx1f" path="res://scenes/agent.tscn" id="6_esebb"]
 [ext_resource type="Texture2D" uid="uid://bbi2ht6xnxeq4" path="res://tiles/factory.png" id="6_o2u82"]
 [ext_resource type="PackedScene" uid="uid://b0qbmivhqfvlu" path="res://scenes/player.tscn" id="7_iq7g2"]
 
@@ -327,7 +326,7 @@ sources/3 = SubResource("TileSetAtlasSource_8gv7c")
 sources/4 = SubResource("TileSetAtlasSource_56hif")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2nduu"]
-size = Vector2(110, 173)
+size = Vector2(126, 207)
 
 [node name="manager" type="Node2D"]
 script = ExtResource("1_l5bp7")
@@ -338,9 +337,6 @@ tile_set = SubResource("TileSet_s0of2")
 format = 2
 layer_0/tile_data = PackedInt32Array(-1, 2, 0)
 script = ExtResource("2_f5x7o")
-
-[node name="agent" parent="." instance=ExtResource("6_esebb")]
-position = Vector2(-60, -31)
 
 [node name="player" parent="." instance=ExtResource("7_iq7g2")]
 position = Vector2(300, 200)
@@ -358,14 +354,14 @@ offset_bottom = 101.0
 [node name="VBoxContainer" type="VBoxContainer" parent="player/Camera2D/UI/HBoxContainer"]
 layout_mode = 2
 
+[node name="house_button" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "build house"
+
 [node name="road_button" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "build road"
-
-[node name="house_button" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "build house"
 
 [node name="build_factory" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -378,6 +374,10 @@ text = "spawn agent"
 [node name="neutral_button" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "do nun"
+
+[node name="delete_button" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "delete building"
 
 [node name="cursor_state_indicator" type="Label" parent="player/Camera2D/UI/HBoxContainer"]
 layout_mode = 2
@@ -392,18 +392,19 @@ size_flags_vertical = 0
 [node name="UI_zone" type="Area2D" parent="player/Camera2D/UI"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player/Camera2D/UI/UI_zone"]
-position = Vector2(54, 85.5)
+position = Vector2(62, 103)
 shape = SubResource("RectangleShape2D_2nduu")
 
 [node name="main_clock" type="Timer" parent="."]
 wait_time = 3.0
 autostart = true
 
-[connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/road_button" to="." method="_on_road_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/house_button" to="." method="_on_house_button_pressed"]
+[connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/road_button" to="." method="_on_road_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/build_factory" to="." method="_on_build_factory_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/spawn_agent_button" to="." method="_on_spawn_agent_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/neutral_button" to="." method="_on_neutral_button_pressed"]
+[connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/delete_button" to="." method="_on_delete_button_pressed"]
 [connection signal="mouse_entered" from="player/Camera2D/UI/UI_zone" to="." method="_on_ui_zone_mouse_entered"]
 [connection signal="mouse_exited" from="player/Camera2D/UI/UI_zone" to="." method="_on_ui_zone_mouse_exited"]
 [connection signal="timeout" from="main_clock" to="." method="_on_timer_timeout"]

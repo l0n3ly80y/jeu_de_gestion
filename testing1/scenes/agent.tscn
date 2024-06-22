@@ -49,6 +49,7 @@ script = ExtResource("1_khrl2")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 1
 shape = SubResource("CircleShape2D_g7sr0")
+one_way_collision = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_od7rc")
