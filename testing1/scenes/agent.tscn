@@ -59,5 +59,6 @@ autoplay = "default"
 autostart = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_postprocessing = 1
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

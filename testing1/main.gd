@@ -2,6 +2,9 @@ extends Node2D
 @onready var building_grid = $building_grid
 @onready var cursor_state_indicator = $player/Camera2D/UI/HBoxContainer/cursor_state_indicator
 @onready var date_label = $player/Camera2D/UI/HBoxContainer/date_label
+@onready var global_pathfinder = $global_pathfinder_positon/global_pathfinder
+@onready var global_pathfinder_positon = $global_pathfinder_positon
+
 
 
 #houses database
@@ -123,6 +126,8 @@ func _input(event):
 			print("inverting")
 			building_grid.invert_build_path= building_grid.invert_build_path!=true
 			print(building_grid.invert_build_path)
+		if event.pressed and event.keycode==KEY_T:
+			print(get_nearest_houses(houses,get_global_mouse_position()))
 
 
 
@@ -198,22 +203,32 @@ func get_element_index(id:int,table):
 			return element_index
 	return -1
 func get_nearest_houses(table,coords:Vector2):#returns the houses list but sorted from shortest to longest distance from coords
-	var distance_min=INF
-	var distance_to_house=0
-	var unsorted_houses=table.duplicate()
-	var nearest_houses=[]
-	var minimum_index=0
-	for i in unsorted_houses.size():
-		distance_min=INF
-		minimum_index=0
-		for j in unsorted_houses.size():
-			distance_to_house=distance(unsorted_houses[i]["coords"],coords)
-			if distance_to_house<distance_min:
-				distance_min=distance_to_house
-				minimum_index=j
-		nearest_houses.append(unsorted_houses[minimum_index])
-		unsorted_houses.remove_at(minimum_index)
+	var tab1=[]
+	var tab2=[]
+	var middle=table.size()/2
+	if table.size()>1:
+		tab1=table.slice(0,middle)
+		tab2=table.slice(middle,table.size())
+		return fusion(get_nearest_houses(tab1,coords),get_nearest_houses(tab2,coords),coords)
+	else:
+		return table
+func fusion(tab1,tab2,coords:Vector2):
+	var fusioned_list=[]
+	while tab1!=[] and tab2!=[]:
+		if path_finding_distance(coords,tab1[0]["coords"]*16)>=path_finding_distance(coords,tab2[0]["coords"]*16):
+			fusioned_list.append(tab1.pop_at(0))
+		else:
+			fusioned_list.append(tab2.pop_at(0))
+	if tab1==[]:
+		fusioned_list+=tab2 
+		
+	else:
+		fusioned_list+=tab1
+	return fusioned_list
+	
 #a tester<	
-
-func distance(a:Vector2,b:Vector2):
-	return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
+func path_finding_distance(start:Vector2,end:Vector2):
+	global_pathfinder_positon.global_position=start
+	global_pathfinder.target_position=end
+	print(global_pathfinder.distance_to_target())
+	return global_pathfinder.distance_to_target()

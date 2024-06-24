@@ -51,12 +51,13 @@ func _on_timer_timeout():
 	
 	make_path(destination)
 func define_domicile(houses_table):
-	for i in range(houses_table.size()):
-		if houses_table[i]["inhabitants"]==[]:
+	var sorted_table=manager.get_nearest_houses(houses_table,workplace_coords)
+	for i in range(sorted_table.size()):
+		if sorted_table[i]["inhabitants"]==[]:
 			print("found")
-			houses_table[i]["inhabitants"].append(id)
-			domicile=houses_table[i]["id"]
-			domicile_coords=houses_table[i]["coords"]
+			houses_table[manager.get_element_index(sorted_table[i]["id"],houses_table)]["inhabitants"].append(id)
+			domicile=sorted_table[i]["id"]
+			domicile_coords=sorted_table[i]["coords"]
 			print(domicile_coords)
 			return 0
 

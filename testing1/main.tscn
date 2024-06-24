@@ -394,12 +394,16 @@ size_flags_vertical = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player/Camera2D/UI/UI_zone"]
 position = Vector2(65.5, 108.25)
 shape = SubResource("RectangleShape2D_2nduu")
+debug_color = Color(0.0753311, 0.620824, 0.541318, 0.42)
 
 [node name="main_clock" type="Timer" parent="."]
 wait_time = 2.0
 autostart = true
 
-[node name="NavigationLink2D" type="NavigationLink2D" parent="."]
+[node name="global_pathfinder_positon" type="Node2D" parent="."]
+
+[node name="global_pathfinder" type="NavigationAgent2D" parent="global_pathfinder_positon"]
+path_postprocessing = 1
 
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/house_button" to="." method="_on_house_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/road_button" to="." method="_on_road_button_pressed"]
