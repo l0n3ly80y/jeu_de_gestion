@@ -4,6 +4,7 @@ extends Node2D
 @onready var date_label = $player/Camera2D/UI/HBoxContainer/date_label
 @onready var global_pathfinder = $global_pathfinder_positon/global_pathfinder
 @onready var global_pathfinder_positon = $global_pathfinder_positon
+@onready var main_menu = $"."
 
 
 
@@ -36,6 +37,33 @@ var basic_house={"id":0,
 "coords":Vector2(0,0),
 "inhabitants":[],
 "rent":0}
+
+
+
+
+func save_game(houses_db,workplaces_db,agents_db,grid_db,path="res://saves/autosave.save"):
+	var save=FileAccess.open(path,FileAccess.WRITE)
+	var agents_data_db=[]
+	for i in agents.size():
+		agents_data_db.append(agents[i]["object"].get_data())
+	var savedict={"houses":houses_db,"workplaces":workplaces_db,"agents_data_db":agents_data_db,"grid_db":grid_db}
+	save.store_var(savedict)
+	
+func load_game(path:String):
+	
+	var save=FileAccess.open(path,FileAccess.READ)
+	var savedict=save.get_var()
+	houses=savedict["houses"]
+	workplaces=savedict["workplaces"]
+	building_grid.grid=savedict["grid_db"]
+	agents=[]
+	for agent in savedict["agents_data_db"]:
+		create_agent(building_grid.local_to_map(agent["position"]),agents)
+		agents[agents.size()-1]["object"].set_data(agent)
+
+
+
+
 func generate_id(table):#returns a suitable id for a new element in a table
 	var maximum_id=0
 	for element in table:
@@ -79,6 +107,13 @@ func create_agent(coords:Vector2,table):
 		add_child(agent)
 		agent.position=coords*16
 		agent.id=id
+func load_agent(data,table):#doesn't work for some reason
+	var object=preload("res://scenes/agent.tscn").instantiate()
+	object.set_data(data)
+	table.append({"id":data["id"],
+		"object":object})
+	print(table)
+	
 func get_id_index(table,id:int):
 	for i in table.size():
 		if table[i]["id"]==id:
@@ -95,8 +130,10 @@ func get_date_string(date_dict:Dictionary)->String:
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#create_house(Vector2(5,9),houses,building_grid.grid)
-	pass
+	if Global.starting_point=="continue" and FileAccess.file_exists("res://saves/autosave.save"):
+		load_game("res://saves/autosave.save")
+	elif Global.starting_point=="load_game" and FileAccess.file_exists(Global.path_to_save_to_load):
+		load_game(Global.path_to_save_to_load)
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	cursor_state_indicator.text=cursor_state#updates the label of the UI
@@ -126,7 +163,11 @@ func _input(event):
 			print("inverting")
 			building_grid.invert_build_path= building_grid.invert_build_path!=true
 			print(building_grid.invert_build_path)
-		if event.pressed and event.keycode==KEY_T:
+		if event.pressed and event.keycode==KEY_S:
+			save_game(houses,workplaces,agents,building_grid.grid)
+		elif event.pressed and event.keycode==KEY_Y:
+			load_game("user://game1.save")
+		elif event.pressed and event.keycode==KEY_T:
 			print(get_nearest_houses(houses,get_global_mouse_position()))
 
 
@@ -215,7 +256,7 @@ func get_nearest_houses(table,coords:Vector2):#returns the houses list but sorte
 func fusion(tab1,tab2,coords:Vector2):
 	var fusioned_list=[]
 	while tab1!=[] and tab2!=[]:
-		if path_finding_distance(coords,tab1[0]["coords"]*16)>=path_finding_distance(coords,tab2[0]["coords"]*16):
+		if path_finding_distance(coords,tab1[0]["coords"]*16)<=path_finding_distance(coords,tab2[0]["coords"]*16):
 			fusioned_list.append(tab1.pop_at(0))
 		else:
 			fusioned_list.append(tab2.pop_at(0))
@@ -230,5 +271,8 @@ func fusion(tab1,tab2,coords:Vector2):
 func path_finding_distance(start:Vector2,end:Vector2):
 	global_pathfinder_positon.global_position=start
 	global_pathfinder.target_position=end
-	print(global_pathfinder.distance_to_target())
 	return global_pathfinder.distance_to_target()
+
+
+func _on_quick_save_button_pressed():
+	save_game(houses,workplaces,agents,building_grid.grid)

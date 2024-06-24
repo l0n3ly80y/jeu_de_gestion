@@ -14,11 +14,23 @@ var workplace_coords=Vector2(0,0)
 var age=0
 var domicile=0
 var domicile_coords=Vector2(0,0)
-var wallet
+var wallet=0
 var destination=Vector2(15,15)
 
 func get_data()->Dictionary:
-	return {"id":id,"workplace":workplace,"age":age,"domicile":domicile,"wallet":wallet}
+	return {"id":id,"workplace":workplace,"workplace_coords":workplace_coords ,"age":age,"domicile":domicile,"domicile_coords":domicile_coords , "wallet":wallet,"position":position,"destination":destination}
+func set_data(data:Dictionary):
+	id=data["id"]
+	workplace=data["workplace"]
+	workplace_coords=data["workplace_coords"]
+	age=data["age"]
+	domicile=data["domicile"]
+	domicile_coords=data["domicile_coords"]
+	wallet=data["wallet"]
+	destination=data["destination"]
+	
+	position=data["position"]
+	print(position/16)
 func distance(a:Vector2,b:Vector2)->float:
 	return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
 func _physics_process(delta):
@@ -78,7 +90,6 @@ func update_domicile(houses_table):
 	if domicile_coords==Vector2(0,0) or manager.get_element_index(domicile,manager.houses)==-1:
 		define_domicile(houses_table)
 
-	
 func _ready():
 	define_workplace(manager.workplaces)
 	define_domicile(manager.houses)

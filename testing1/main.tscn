@@ -326,7 +326,7 @@ sources/3 = SubResource("TileSetAtlasSource_8gv7c")
 sources/4 = SubResource("TileSetAtlasSource_56hif")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2nduu"]
-size = Vector2(133, 217.5)
+size = Vector2(133, 248.5)
 
 [node name="manager" type="Node2D"]
 script = ExtResource("1_l5bp7")
@@ -379,6 +379,10 @@ text = "do nun"
 layout_mode = 2
 text = "delete building"
 
+[node name="quick_save_button" type="Button" parent="player/Camera2D/UI/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "quick save"
+
 [node name="cursor_state_indicator" type="Label" parent="player/Camera2D/UI/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
@@ -392,9 +396,9 @@ size_flags_vertical = 0
 [node name="UI_zone" type="Area2D" parent="player/Camera2D/UI"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player/Camera2D/UI/UI_zone"]
-position = Vector2(65.5, 108.25)
+position = Vector2(65.5, 123.75)
 shape = SubResource("RectangleShape2D_2nduu")
-debug_color = Color(0.0753311, 0.620824, 0.541318, 0.42)
+debug_color = Color(0.349434, 0.55751, 0.733778, 0.42)
 
 [node name="main_clock" type="Timer" parent="."]
 wait_time = 2.0
@@ -411,6 +415,7 @@ path_postprocessing = 1
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/spawn_agent_button" to="." method="_on_spawn_agent_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/neutral_button" to="." method="_on_neutral_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/delete_button" to="." method="_on_delete_button_pressed"]
+[connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/quick_save_button" to="." method="_on_quick_save_button_pressed"]
 [connection signal="mouse_entered" from="player/Camera2D/UI/UI_zone" to="." method="_on_ui_zone_mouse_entered"]
 [connection signal="mouse_exited" from="player/Camera2D/UI/UI_zone" to="." method="_on_ui_zone_mouse_exited"]
 [connection signal="timeout" from="main_clock" to="." method="_on_timer_timeout"]

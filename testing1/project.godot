@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="test_for_town_builder"
-run/main_scene="res://main.tscn"
+run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Global="*res://global.gd"
 
 [rendering]
 
