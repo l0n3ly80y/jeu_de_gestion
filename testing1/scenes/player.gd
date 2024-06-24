@@ -9,14 +9,25 @@ const speed = 20
 func _physics_process(delta):
 	velocity=dir*speed
 	move_and_slide()
-func _input(event):
-	
-	if event is InputEventKey:
-		if event.pressed and event.keycode==KEY_UP and dir.y>-2:
-			dir.y-=1
-		elif event.keycode==KEY_DOWN and dir.y<2:
-			dir.y+=1
-		elif event.keycode==KEY_RIGHT and dir.x<2:
-			dir.x+=1
-		elif event.keycode==KEY_LEFT and dir.x>-2:
-			dir.x-=1
+	var is_moving_horizontal=false
+	var is_moving_vertical=false
+	if Input.is_action_pressed("ui_down"):
+		dir.y=2
+		is_moving_vertical=true
+	elif Input.is_action_pressed("ui_up"):
+		dir.y=-2
+		is_moving_vertical=true
+		
+	if Input.is_action_pressed("ui_left"):
+		dir.x=-2
+		is_moving_horizontal=true
+		
+	elif Input.is_action_pressed("ui_right"):
+		dir.x=2
+		is_moving_horizontal=true
+	if !is_moving_vertical:
+		dir.y=0
+	if !is_moving_horizontal:
+		dir.x=0		
+
+

@@ -8,6 +8,7 @@ extends Node2D
 var houses=[]
 #workplaces
 var workplaces=[]
+const workplace_types=["factory"]
 #agents database
 var agents=[]
 #time management
@@ -114,7 +115,7 @@ func _input(event):
 			elif cursor_state=="building_factory":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces)
 			elif cursor_state=="delete_building":
-				pass
+				building_grid.delete_building(building_grid.mouse_tile_map_pos,building_grid.grid)
 				cursor_state="none"
 				
 	elif event is InputEventKey:
@@ -128,8 +129,13 @@ func _input(event):
 
 func remove_building(type:String,id:int):
 	if type=="house":
-		houses
-
+		var index_of_building=get_element_index(id,houses)
+		houses.remove_at(index_of_building)
+	elif type in workplace_types:
+		var index_of_building=get_element_index(id,workplaces)
+		
+		workplaces.remove_at(index_of_building)
+	update_agents()
 func _on_road_button_pressed():
 	if cursor_state=="none":		
 		cursor_state="building_road_begin"
@@ -166,7 +172,7 @@ func _on_delete_button_pressed():
 func _on_timer_timeout():
 	date["hour"]+=1
 	if date["hour"]>=24:
-		update_day_state()
+		update_agents()
 		date["hour"]=0
 		date["day"]+=1
 		if date["weekday"]<6:
@@ -181,7 +187,7 @@ func _on_timer_timeout():
 				date["year"]+=1
 	date_label.text=get_date_string(date)
 
-func update_day_state():
+func update_agents():
 	for agent in agents:
 		agent["object"].update_workplace(workplaces)
 		agent["object"].update_domicile(houses)
@@ -191,5 +197,23 @@ func get_element_index(id:int,table):
 		if table[element_index]["id"]==id:
 			return element_index
 	return -1
+func get_nearest_houses(table,coords:Vector2):#returns the houses list but sorted from shortest to longest distance from coords
+	var distance_min=INF
+	var distance_to_house=0
+	var unsorted_houses=table.duplicate()
+	var nearest_houses=[]
+	var minimum_index=0
+	for i in unsorted_houses.size():
+		distance_min=INF
+		minimum_index=0
+		for j in unsorted_houses.size():
+			distance_to_house=distance(unsorted_houses[i]["coords"],coords)
+			if distance_to_house<distance_min:
+				distance_min=distance_to_house
+				minimum_index=j
+		nearest_houses.append(unsorted_houses[minimum_index])
+		unsorted_houses.remove_at(minimum_index)
+#a tester<	
 
-
+func distance(a:Vector2,b:Vector2):
+	return sqrt((a.x-b.x)**2+(a.y-b.y)**2)

@@ -28,7 +28,8 @@ var invert_build_path=false
 #
 func delete_building(coords,layout):
 	var element=layout[coords.x][coords.y]
-	if element["type"]=="house" or element["type"]=="house":
+	if element["type"]=="house" or element["type"]=="factory":
+		print("element to delete id:"+str(element["id"]))
 		manager.remove_building(element["type"],element["id"])
 	layout[coords.x][coords.y]={
 				"type":"grass",
@@ -37,9 +38,6 @@ func delete_building(coords,layout):
 				"id":0,
 				"connections":"none"
 	}
-	
-		
-	
 
 
 #path to build road
@@ -59,7 +57,10 @@ func update_grid(layout):
 			"type":workplace["type"],
 			"id":workplace['id'],
 		}
-	
+	for x in layout.size():
+		for y in layout[0].size():
+			if layout[x][y]["type"]=="road":
+				place_road(Vector2(x,y),layout,0)
 func set_layout_on_tilemap(layout):
 	for x in grid.size():
 		for y in grid.size():

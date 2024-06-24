@@ -70,15 +70,16 @@ func define_workplace(workplace_table):
 			return 0
 			
 func update_workplace(workplace_table):
-	if workplace_coords==Vector2(0,0) or manager.get_element_index(domicile,workplace_table)==-1:#if no workplace or worplace deleted
+	if workplace_coords==Vector2(0,0) or manager.get_element_index(workplace,manager.workplaces)==-1:#if no workplace or worplace deleted
 		print("new work")
 		define_workplace(workplace_table)
 func update_domicile(houses_table):
-	if domicile_coords==Vector2(0,0) or manager.get_element_index(domicile,houses_table)==-1:
+	if domicile_coords==Vector2(0,0) or manager.get_element_index(domicile,manager.houses)==-1:
 		define_domicile(houses_table)
 
 	
 func _ready():
-	define_domicile(manager.houses)
 	define_workplace(manager.workplaces)
+	define_domicile(manager.houses)
+	
 	animated_sprite_2d.frame=randi_range(0,3)

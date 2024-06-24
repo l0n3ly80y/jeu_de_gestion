@@ -326,7 +326,7 @@ sources/3 = SubResource("TileSetAtlasSource_8gv7c")
 sources/4 = SubResource("TileSetAtlasSource_56hif")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2nduu"]
-size = Vector2(126, 207)
+size = Vector2(133, 217.5)
 
 [node name="manager" type="Node2D"]
 script = ExtResource("1_l5bp7")
@@ -392,12 +392,14 @@ size_flags_vertical = 0
 [node name="UI_zone" type="Area2D" parent="player/Camera2D/UI"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player/Camera2D/UI/UI_zone"]
-position = Vector2(62, 103)
+position = Vector2(65.5, 108.25)
 shape = SubResource("RectangleShape2D_2nduu")
 
 [node name="main_clock" type="Timer" parent="."]
-wait_time = 3.0
+wait_time = 2.0
 autostart = true
+
+[node name="NavigationLink2D" type="NavigationLink2D" parent="."]
 
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/house_button" to="." method="_on_house_button_pressed"]
 [connection signal="pressed" from="player/Camera2D/UI/HBoxContainer/VBoxContainer/road_button" to="." method="_on_road_button_pressed"]
