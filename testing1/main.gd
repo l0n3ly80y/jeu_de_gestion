@@ -1,7 +1,12 @@
 extends Node2D
 @onready var building_grid = $building_grid
-@onready var cursor_state_indicator = $player/Camera2D/UI/HBoxContainer/cursor_state_indicator
-@onready var date_label = $player/Camera2D/UI/HBoxContainer/date_label
+@onready var cursor_state_indicator = $UI/HBoxContainer/cursor_state_indicator
+@onready var date_label = $UI/HBoxContainer/date_label
+
+const pause_screen=preload("res://scenes/in_game_menu.tscn")
+
+#@onready var cursor_state_indicator = $player/Camera2D/UI/HBoxContainer/cursor_state_indicator
+#@onready var date_label = $player/Camera2D/UI/HBoxContainer/date_label
 @onready var global_pathfinder = $global_pathfinder_positon/global_pathfinder
 @onready var global_pathfinder_positon = $global_pathfinder_positon
 @onready var main_menu = $"."
@@ -15,6 +20,8 @@ var workplaces=[]
 const workplace_types=["factory"]
 #agents database
 var agents=[]
+#metro station database
+var metro_stations=[]
 #time management
 const weekdays=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
 const months=["january","february","march","april","may","june","july","august","september","october","november","december"]
@@ -39,14 +46,19 @@ var basic_house={"id":0,
 "rent":0}
 
 
+func pause_menu():#called when the escape key is pressed
+	var pause=pause_screen.instantiate()
+	add_child(pause)
 
-
-func save_game(houses_db,workplaces_db,agents_db,grid_db,path="res://saves/autosave.save"):
+func save_game(houses_db=houses,workplaces_db=workplaces,agents_db=agents,grid_db=building_grid.grid,path="res://saves/autosave.save"):
 	var save=FileAccess.open(path,FileAccess.WRITE)
 	var agents_data_db=[]
+	var metro_stations_db=[]
 	for i in agents.size():
 		agents_data_db.append(agents[i]["object"].get_data())
-	var savedict={"houses":houses_db,"workplaces":workplaces_db,"agents_data_db":agents_data_db,"grid_db":grid_db}
+	for i in metro_stations.size():
+		metro_stations_db.append(metro_stations[i]["object"].get_data())
+	var savedict={"houses":houses_db,"workplaces":workplaces_db,"agents_data_db":agents_data_db,"grid_db":grid_db,"metro_stations_db":metro_stations_db}
 	save.store_var(savedict)
 	
 func load_game(path:String):
@@ -58,8 +70,9 @@ func load_game(path:String):
 	building_grid.grid=savedict["grid_db"]
 	agents=[]
 	for agent in savedict["agents_data_db"]:
-		create_agent(building_grid.local_to_map(agent["position"]),agents)
-		agents[agents.size()-1]["object"].set_data(agent)
+		load_agent(agent,agents)
+	for station in savedict["metro_stations_db"]:
+		load_station(station)
 
 
 
@@ -85,8 +98,33 @@ func create_house(coords:Vector2,table,layout):
 	else:
 		return 0
 
-
-
+func create_station(coords:Vector2,table):
+	if building_grid.grid[coords.x][coords.y]["type"]=="grass" and building_grid.grid[coords.x+1][coords.y]["type"]=="grass" and building_grid.grid[coords.x][coords.y+1]["type"]=="grass" and building_grid.grid[coords.x+1][coords.y+1]["type"]=="grass":
+		var id=generate_id(table)
+		var metro_station=preload("res://scenes/metro_station.tscn").instantiate()
+		add_child(metro_station)
+		metro_station.position=coords*16+Vector2(16,16)
+		metro_station.id=id
+		metro_station.coords=coords
+		table.append({"id":id,"object":metro_station,"coords":coords})
+		building_grid.set_built_tile(coords,id)
+		building_grid.set_built_tile(coords+Vector2(0,1),id)
+		building_grid.set_built_tile(coords+Vector2(1,0),id)
+		building_grid.set_built_tile(coords+Vector2(1,1),id)
+		return 1
+	else:
+		return 0
+func load_station(data,table=metro_stations):
+	var metro_station=preload("res://scenes/metro_station.tscn").instantiate()
+	var id=data["id"]
+	var coords=data["coords"]
+	add_child(metro_station)
+	metro_station.set_data(data)
+	table.append({"id":id,"object":metro_station,"coords":coords})
+	building_grid.set_built_tile(coords,id)
+	building_grid.set_built_tile(coords+Vector2(0,1),id)
+	building_grid.set_built_tile(coords+Vector2(1,0),id)
+	building_grid.set_built_tile(coords+Vector2(1,1),id)
 func create_workplace(coords:Vector2,table,type="factory"):
 	if building_grid.grid[coords.x][coords.y]["type"]=="grass":
 		table.append({
@@ -109,7 +147,9 @@ func create_agent(coords:Vector2,table):
 		agent.id=id
 func load_agent(data,table):#doesn't work for some reason
 	var object=preload("res://scenes/agent.tscn").instantiate()
+	add_child(object)
 	object.set_data(data)
+	
 	table.append({"id":data["id"],
 		"object":object})
 	print(table)
@@ -157,6 +197,9 @@ func _input(event):
 			elif cursor_state=="delete_building":
 				building_grid.delete_building(building_grid.mouse_tile_map_pos,building_grid.grid)
 				cursor_state="none"
+			elif cursor_state=="building_station":
+				cursor_state="none"
+				create_station(building_grid.mouse_tile_map_pos,metro_stations)
 				
 	elif event is InputEventKey:
 		if event.pressed and event.keycode==KEY_I:
@@ -168,10 +211,14 @@ func _input(event):
 		elif event.pressed and event.keycode==KEY_Y:
 			load_game("user://game1.save")
 		elif event.pressed and event.keycode==KEY_T:
-			print(get_nearest_houses(houses,get_global_mouse_position()))
+			pass#print(path_finding_distance_with_metro(Vector2(0,0),get_global_mouse_position()))
+		
 
 
-
+func _unhandled_input(event):
+	if event is InputEventKey:
+		if event.pressed and event.keycode==KEY_ESCAPE:
+			pause_menu()
 
 func remove_building(type:String,id:int):
 	if type=="house":
@@ -243,20 +290,23 @@ func get_element_index(id:int,table):
 		if table[element_index]["id"]==id:
 			return element_index
 	return -1
-func get_nearest_houses(table,coords:Vector2):#returns the houses list but sorted from shortest to longest distance from coords
+func get_nearest_building(table,coords:Vector2,use_metro=false):#returns the houses list but sorted from shortest to longest distance from coords
 	var tab1=[]
 	var tab2=[]
 	var middle=table.size()/2
 	if table.size()>1:
 		tab1=table.slice(0,middle)
 		tab2=table.slice(middle,table.size())
-		return fusion(get_nearest_houses(tab1,coords),get_nearest_houses(tab2,coords),coords)
+		return fusion(get_nearest_building(tab1,coords),get_nearest_building(tab2,coords),coords)
 	else:
 		return table
+		
 func fusion(tab1,tab2,coords:Vector2):
 	var fusioned_list=[]
 	while tab1!=[] and tab2!=[]:
-		if path_finding_distance(coords,tab1[0]["coords"]*16)<=path_finding_distance(coords,tab2[0]["coords"]*16):
+
+
+		if path_finding_distance_with_metro(coords,tab1[0]["coords"]*16)<=path_finding_distance_with_metro(coords,tab2[0]["coords"]*16):
 			fusioned_list.append(tab1.pop_at(0))
 		else:
 			fusioned_list.append(tab2.pop_at(0))
@@ -266,13 +316,48 @@ func fusion(tab1,tab2,coords:Vector2):
 	else:
 		fusioned_list+=tab1
 	return fusioned_list
+
 	
 #a tester<	
 func path_finding_distance(start:Vector2,end:Vector2):
 	global_pathfinder_positon.global_position=start
 	global_pathfinder.target_position=end
 	return global_pathfinder.distance_to_target()
-
+func path_finding_distance_with_metro(start:Vector2,end:Vector2):
+	var walk_distance=path_finding_distance(start,end)
+	if metro_stations!=[]:
+		var starting_station=get_nearest_station(start)	
+		var end_station=get_nearest_station(end)
+		var metro_distance=path_finding_distance(start,starting_station[0])+20+path_finding_distance(end_station[0],end)
+		if metro_distance<walk_distance:
+			return metro_distance
+		else:
+			return walk_distance
+	else:
+		return walk_distance
+func get_subway_path(start:Vector2,end:Vector2):
+	if path_finding_distance(start,end)==path_finding_distance_with_metro(start,end):
+		return [end]
+	else:
+		var path=[]
+		path.append(get_nearest_station(start)[0]+Vector2(0,20))
+		path.append(end)
+		return path
+func get_nearest_station(coords:Vector2):
+	var minimum_distance=INF
+	var minimum_pos=Vector2(0,0)
+	var distance=0
+	var minimum_id=0
+	for station in metro_stations:
+		distance=path_finding_distance(coords,station["coords"]*16)
+		if path_finding_distance(coords,station["object"].position)<minimum_distance:
+			minimum_distance=distance
+			minimum_pos=station["object"].position
+			minimum_id=station["id"]
+	return [minimum_pos,minimum_id]
+	
 
 func _on_quick_save_button_pressed():
 	save_game(houses,workplaces,agents,building_grid.grid)
+func _on_build_metro_station_button_pressed():
+	cursor_state="building_station"

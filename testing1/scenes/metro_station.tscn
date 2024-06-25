@@ -1,0 +1,114 @@
+[gd_scene load_steps=15 format=3 uid="uid://cpmkfkw48pfph"]
+
+[ext_resource type="Texture2D" uid="uid://dgxblb6y210hm" path="res://sprites/metro_station.png" id="1_edm0u"]
+[ext_resource type="Script" path="res://scenes/metro_station.gd" id="1_svtwa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e78gd"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nafd3"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lattn"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uinlv"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dsggb"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eajgg"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1m784"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wf3us"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(32, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fkahu"]
+atlas = ExtResource("1_edm0u")
+region = Rect2(64, 64, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4dv3w"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e78gd")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e78gd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nafd3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lattn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uinlv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dsggb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eajgg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eajgg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eajgg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1m784")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wf3us")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fkahu")
+}],
+"loop": true,
+"name": &"metro_arrival",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u0tha"]
+size = Vector2(32, 32)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t6s6m"]
+radius = 4.0
+height = 26.0
+
+[node name="metro_station" type="StaticBody2D"]
+script = ExtResource("1_svtwa")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_4dv3w")
+autoplay = "default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_u0tha")
+
+[node name="entrance" type="Area2D" parent="."]
+position = Vector2(0, 20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="entrance"]
+rotation = -1.5708
+shape = SubResource("CapsuleShape2D_t6s6m")

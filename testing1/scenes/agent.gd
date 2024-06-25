@@ -16,9 +16,10 @@ var domicile=0
 var domicile_coords=Vector2(0,0)
 var wallet=0
 var destination=Vector2(15,15)
+var variant=0
 
 func get_data()->Dictionary:
-	return {"id":id,"workplace":workplace,"workplace_coords":workplace_coords ,"age":age,"domicile":domicile,"domicile_coords":domicile_coords , "wallet":wallet,"position":position,"destination":destination}
+	return {"id":id,"workplace":workplace,"workplace_coords":workplace_coords ,"age":age,"domicile":domicile,"domicile_coords":domicile_coords , "wallet":wallet,"position":position,"destination":destination,"variant":variant}
 func set_data(data:Dictionary):
 	id=data["id"]
 	workplace=data["workplace"]
@@ -28,9 +29,9 @@ func set_data(data:Dictionary):
 	domicile_coords=data["domicile_coords"]
 	wallet=data["wallet"]
 	destination=data["destination"]
-	
+	variant=data["variant"]
+	animated_sprite_2d.frame=variant
 	position=data["position"]
-	print(position/16)
 func distance(a:Vector2,b:Vector2)->float:
 	return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
 func _physics_process(delta):
@@ -53,17 +54,16 @@ func _input(event):
 			position=get_global_mouse_position()
 
 func _on_timer_timeout():
-	if manager.date["hour"]<16 and manager.date["hour"]>7:
+	if manager.date["hour"]==7:
 		destination=workplace_coords*16
 	else:
 		destination=domicile_coords*16
 	#debug to check the coords of workplace
 	#print("[*]destination of "+str(id)+": "+str(destination))
 	#print("[*]domicile of "+str(id)+": "+str(domicile_coords))
-	
 	make_path(destination)
 func define_domicile(houses_table):
-	var sorted_table=manager.get_nearest_houses(houses_table,workplace_coords)
+	var sorted_table=manager.get_nearest_building(houses_table,workplace_coords*16)
 	for i in range(sorted_table.size()):
 		if sorted_table[i]["inhabitants"]==[]:
 			print("found")
@@ -93,5 +93,5 @@ func update_domicile(houses_table):
 func _ready():
 	define_workplace(manager.workplaces)
 	define_domicile(manager.houses)
-	
-	animated_sprite_2d.frame=randi_range(0,3)
+	variant=randi_range(0,3)
+	animated_sprite_2d.frame=variant

@@ -75,6 +75,8 @@ func set_layout_on_tilemap(layout):
 				set_cell(0,Vector2(x,y),0,Vector2(connections_to_tile[layout[x][y]["connections"]],facing_to_tile[layout[x][y]["facing"]]))
 			elif type=="factory":
 				set_cell(0,Vector2(x,y),4,Vector2(0,0))
+			elif type=="built_tile":
+				set_cell(0,Vector2(x,y),5,Vector2(0,0))
 func clean_layout(layout):
 	for x in grid.size():
 		for y in grid.size():
@@ -252,6 +254,12 @@ func connect_road(a:Vector2,b:Vector2,layout,invert:=false,preview:=false):
 			}
 		else:
 			place_road(coords,layout)
+			
+func set_built_tile(coords,id:int):
+	grid[coords.x][coords.y]={
+		"id":id,
+		"type":"built_tile"
+	}
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	mouse_tile_map_pos=local_to_map(get_global_mouse_position())

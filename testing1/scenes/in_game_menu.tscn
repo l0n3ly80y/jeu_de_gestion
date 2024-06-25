@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://b0n8exht12l8v"]
+
+[ext_resource type="Script" path="res://scenes/in_game_menu.gd" id="1_xi8er"]
+
+[node name="in_game_menu" type="CanvasLayer"]
+process_mode = 2
+scale = Vector2(0.5, 0.5)
+transform = Transform2D(0.5, 0, 0, 0.5, 0, 0)
+follow_viewport_enabled = true
+script = ExtResource("1_xi8er")
+
+[node name="overlay" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="Pause_menu_container" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Pause_menu_container"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Pause_menu_container/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="rows" type="VBoxContainer" parent="Pause_menu_container/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Pause_menu_container/PanelContainer/MarginContainer/rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Cybersim - menu"
+
+[node name="HSeparator" type="HSeparator" parent="Pause_menu_container/PanelContainer/MarginContainer/rows"]
+layout_mode = 2
+
+[node name="continue_button" type="Button" parent="Pause_menu_container/PanelContainer/MarginContainer/rows"]
+layout_mode = 2
+text = "continue"
+
+[node name="save_quit_button" type="Button" parent="Pause_menu_container/PanelContainer/MarginContainer/rows"]
+layout_mode = 2
+text = "save and quit"
+
+[node name="save_game_button" type="Button" parent="Pause_menu_container/PanelContainer/MarginContainer/rows"]
+layout_mode = 2
+text = "save"
+
+[connection signal="pressed" from="Pause_menu_container/PanelContainer/MarginContainer/rows/continue_button" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="Pause_menu_container/PanelContainer/MarginContainer/rows/save_quit_button" to="." method="_on_save_quit_button_pressed"]
+[connection signal="pressed" from="Pause_menu_container/PanelContainer/MarginContainer/rows/save_game_button" to="." method="_on_save_game_button_pressed"]
