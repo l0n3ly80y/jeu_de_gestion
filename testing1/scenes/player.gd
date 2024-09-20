@@ -29,5 +29,3 @@ func _physics_process(delta):
 		dir.y=0
 	if !is_moving_horizontal:
 		dir.x=0		
-
-

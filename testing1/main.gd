@@ -74,9 +74,6 @@ func load_game(path:String):
 	for station in savedict["metro_stations_db"]:
 		load_station(station)
 
-
-
-
 func generate_id(table):#returns a suitable id for a new element in a table
 	var maximum_id=0
 	for element in table:

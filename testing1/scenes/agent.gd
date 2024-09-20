@@ -8,6 +8,7 @@ extends CharacterBody2D
 
 const speed=20
 #variable individual's data
+var destination_type="building"
 var id=0
 var workplace=0
 var workplace_coords=Vector2(0,0)
@@ -38,7 +39,7 @@ func _physics_process(delta):
 	var dir=to_local(nav_agent.get_next_path_position()).normalized()
 	velocity=dir*speed
 	move_and_slide()
-	if distance(position,destination)<25:
+	if distance(position,destination)<25 and destination_type=="building":
 		visible=false
 		destination=position
 		collision_shape_2d.disabled=true
@@ -54,10 +55,21 @@ func _input(event):
 			position=get_global_mouse_position()
 
 func _on_timer_timeout():
-	if manager.date["hour"]==7:
-		destination=workplace_coords*16
+	if manager.date["weekday"]==5 or manager.date["weekday"]==6:#5 for saturday and 6 for monday
+		if manager.date["hour"]==10:
+			destination_type="outside"
+			
+			destination=domicile_coords*16+Vector2(randi_range(-80,80),randi_range(-80,80))#workplace and domicile coords are for the building grids, every tile is 16x16
+		elif manager.date["hour"]==22:
+			destination_type="building"
+			destination=domicile_coords*16
 	else:
-		destination=domicile_coords*16
+		if manager.date["hour"]==7:
+			destination_type="building"
+			destination=workplace_coords*16#workplace and domicile coords are for the building grids, every tile is 16x16
+		elif manager.date["hour"]==17:
+			destination_type="building"
+			destination=domicile_coords*16
 	#debug to check the coords of workplace
 	#print("[*]destination of "+str(id)+": "+str(destination))
 	#print("[*]domicile of "+str(id)+": "+str(domicile_coords))
