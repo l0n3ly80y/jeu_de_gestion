@@ -58,13 +58,14 @@ func save_game(houses_db=houses,workplaces_db=workplaces,agents_db=agents,grid_d
 		agents_data_db.append(agents[i]["object"].get_data())
 	for i in metro_stations.size():
 		metro_stations_db.append(metro_stations[i]["object"].get_data())
-	var savedict={"houses":houses_db,"workplaces":workplaces_db,"agents_data_db":agents_data_db,"grid_db":grid_db,"metro_stations_db":metro_stations_db}
+	var savedict={"houses":houses_db,"workplaces":workplaces_db,"agents_data_db":agents_data_db,"grid_db":grid_db,"metro_stations_db":metro_stations_db,"date":date}
 	save.store_var(savedict)
 	
 func load_game(path:String):
 	
 	var save=FileAccess.open(path,FileAccess.READ)
 	var savedict=save.get_var()
+	date=savedict["date"]
 	houses=savedict["houses"]
 	workplaces=savedict["workplaces"]
 	building_grid.grid=savedict["grid_db"]
