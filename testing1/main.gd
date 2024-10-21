@@ -124,16 +124,33 @@ func load_station(data,table=metro_stations):
 	building_grid.set_built_tile(coords+Vector2(1,0),id)
 	building_grid.set_built_tile(coords+Vector2(1,1),id)
 func create_workplace(coords:Vector2,table,type="factory"):
-	if building_grid.grid[coords.x][coords.y]["type"]=="grass":
-		table.append({
+	var workplace_dict={}
+	if type=="factory":
+		workplace_dict={
 			"type":type,
 			"id":generate_id(table),
 			"coords":coords,
-			"employees":[]
-		})
+			"employees":[],
+			"inventory":[],
+			"capacity":10,
+			"employee_needs":{"worker":5}
+		}
+	elif type=="farm":
+		workplace_dict={
+			"type":type,
+			"id":generate_id(table),
+			"coords":coords,
+			"employees":[],
+			"inventory":[],
+			"capacity":10,
+			"employee_needs":{"farmer":2,"deliverer":1}
+		}
+	if building_grid.grid[coords.x][coords.y]["type"]=="grass":
+		table.append(workplace_dict)
 		return 1
 	else:
 		return 0
+
 func create_agent(coords:Vector2,table):
 	if building_grid.grid[coords.x][coords.y]["type"]=="road":
 		var id=generate_id(table)
@@ -192,6 +209,8 @@ func _input(event):
 				create_agent(building_grid.mouse_tile_map_pos,agents)
 			elif cursor_state=="building_factory":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces)
+			elif cursor_state=="building_farm":
+				create_workplace(building_grid.mouse_tile_map_pos,workplaces,"farm")
 			elif cursor_state=="delete_building":
 				building_grid.delete_building(building_grid.mouse_tile_map_pos,building_grid.grid)
 				cursor_state="none"
@@ -298,12 +317,9 @@ func get_nearest_building(table,coords:Vector2,use_metro=false):#returns the hou
 		return fusion(get_nearest_building(tab1,coords),get_nearest_building(tab2,coords),coords)
 	else:
 		return table
-		
 func fusion(tab1,tab2,coords:Vector2):
 	var fusioned_list=[]
 	while tab1!=[] and tab2!=[]:
-
-
 		if path_finding_distance_with_metro(coords,tab1[0]["coords"]*16)<=path_finding_distance_with_metro(coords,tab2[0]["coords"]*16):
 			fusioned_list.append(tab1.pop_at(0))
 		else:
@@ -359,3 +375,12 @@ func _on_quick_save_button_pressed():
 	save_game(houses,workplaces,agents,building_grid.grid)
 func _on_build_metro_station_button_pressed():
 	cursor_state="building_station"
+
+
+func _on_build_farm_pressed() -> void:
+	cursor_state="building_farm"
+
+
+func _on_build_shop_pressed() -> void:
+	cursor_state="building_shop"
+	

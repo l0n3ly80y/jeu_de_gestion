@@ -77,6 +77,9 @@ func set_layout_on_tilemap(layout):
 				set_cell(0,Vector2(x,y),4,Vector2(0,0))
 			elif type=="built_tile":
 				set_cell(0,Vector2(x,y),5,Vector2(0,0))
+			elif type=="farm":
+				set_cell(0,Vector2(x,y),6,Vector2(0,0))
+				
 func clean_layout(layout):
 	for x in grid.size():
 		for y in grid.size():
