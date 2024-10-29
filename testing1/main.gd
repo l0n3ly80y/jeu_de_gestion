@@ -28,24 +28,22 @@ const months=["january","february","march","april","may","june","july","august",
 const months_length=[31,29,31,30,31,30,31,31,30,31,30,31]
 var date={"hour":0,"day":1,"month":0,"year":0,"weekday":0}
 
-
-
-
 #mouse screen position
 var mouse_screen_pos=Vector2(0,0)
 #to check if the mouse is inside the UI zone
 var is_mouse_on_UI=false
 #example: building a road
 var cursor_state="none"
-
-
-
 var basic_house={"id":0,
 "coords":Vector2(0,0),
 "inhabitants":[],
 "rent":0}
 
-
+func get_occupied_space(inventory_list):
+	var occupied_space=0
+	for i in inventory_list:
+		occupied_space+=i["size"]
+	return occupied_space
 func pause_menu():#called when the escape key is pressed
 	var pause=pause_screen.instantiate()
 	add_child(pause)
@@ -143,14 +141,46 @@ func create_workplace(coords:Vector2,table,type="factory"):
 			"employees":[],
 			"inventory":[],
 			"capacity":10,
-			"employee_needs":{"farmer":2,"deliverer":1}
+			"employee_needs":{"farmer":2}
+		}
+	elif type=="shop":
+		var farms =get_nearest_building(get_list_of_type(workplaces,"farm"),coords)
+		workplace_dict={
+			"type":type,
+			"id":generate_id(table),
+			"coords":coords,
+			"employees":[],
+			"inventory":[],
+			"capacity":50,
+			"employee_needs":{"shop_deliverer":1,"retailer":2},
+			"farm":farms[0]
 		}
 	if building_grid.grid[coords.x][coords.y]["type"]=="grass":
 		table.append(workplace_dict)
 		return 1
 	else:
 		return 0
-
+func get_info(table,id,key):
+	if table=="workplaces":
+		return workplaces[get_id_index(workplaces,id)][key]
+func add_item_to_building(item,table,id):
+	if table=="workplaces":
+		var index=get_id_index(workplaces,id)
+		if workplaces[index]["capacity"]-get_occupied_space(workplaces[index]["inventory"]):
+			workplaces[index]["inventory"].append(item)
+			#print(workplaces[index]["inventory"])
+			return 1
+		else:
+			return 0
+func retrieve_item_from_building(item,table,id):
+	if table=="workplaces":
+		var index=get_id_index(workplaces,id)
+		if workplaces[index]["inventory"].has(item):
+			workplaces[index]["inventory"].remove_at(workplaces[index]["inventory"].find(item))
+			#print(workplaces[index]["inventory"])
+			return 1
+		else:
+			return 0
 func create_agent(coords:Vector2,table):
 	if building_grid.grid[coords.x][coords.y]["type"]=="road":
 		var id=generate_id(table)
@@ -159,7 +189,9 @@ func create_agent(coords:Vector2,table):
 		"object":agent})
 		add_child(agent)
 		agent.position=coords*16
-		agent.id=id
+		agent.set_id(id)
+		agent.define_domicile(houses)
+		agent.define_workplace(workplaces)
 func load_agent(data,table):#doesn't work for some reason
 	var object=preload("res://scenes/agent.tscn").instantiate()
 	add_child(object)
@@ -211,6 +243,8 @@ func _input(event):
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces)
 			elif cursor_state=="building_farm":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces,"farm")
+			elif cursor_state=="building_shop":
+				create_workplace(building_grid.mouse_tile_map_pos,workplaces,"shop")
 			elif cursor_state=="delete_building":
 				building_grid.delete_building(building_grid.mouse_tile_map_pos,building_grid.grid)
 				cursor_state="none"
@@ -254,10 +288,7 @@ func _on_road_button_pressed():
 
 
 func _on_house_button_pressed():
-	if cursor_state=="none":
-		cursor_state="building_house"
-	else:
-		cursor_state="none"
+	cursor_state="building_house"
 
 
 func _on_neutral_button_pressed():
@@ -307,6 +338,12 @@ func get_element_index(id:int,table):
 		if table[element_index]["id"]==id:
 			return element_index
 	return -1
+func get_list_of_type(table,type):
+	var list_of_type=[]
+	for i in table:
+		if i["type"]==type:
+			list_of_type.append(i)
+	return list_of_type
 func get_nearest_building(table,coords:Vector2,use_metro=false):#returns the houses list but sorted from shortest to longest distance from coords
 	var tab1=[]
 	var tab2=[]

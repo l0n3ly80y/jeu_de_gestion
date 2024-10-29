@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://e7cktgqivg0u"]
+[gd_scene load_steps=41 format=3 uid="uid://e7cktgqivg0u"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_l5bp7"]
 [ext_resource type="Texture2D" uid="uid://snee3gif3iyu" path="res://tiles/2dPaths.png" id="1_n4iox"]
@@ -240,9 +240,16 @@ texture = ExtResource("7_n7k2e")
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_p45kr"]
+vertices = PackedVector2Array(8, -3, 8, 2, 2.5, 8, -3.125, 8, -8, 3.25, -8, -4.5, -2.625, -8, 2.625, -8)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-2.625, -8, 2.625, -8, 8, -3, 8, 2, 2.5, 8, -3.125, 8, -8, 3.25, -8, -4.5)])
+agent_radius = 0.0
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_m31gt"]
 texture = ExtResource("8_26brd")
 0:0/0 = 0
+0:0/0/navigation_layer_0/polygon = SubResource("NavigationPolygon_p45kr")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vmn0r"]
 texture = ExtResource("9_xj12l")
@@ -282,7 +289,7 @@ zoom = Vector2(2, 2)
 position_smoothing_speed = 3.0
 
 [node name="main_clock" type="Timer" parent="."]
-wait_time = 2.0
+wait_time = 2.5
 autostart = true
 
 [node name="global_pathfinder_positon" type="Node2D" parent="."]
