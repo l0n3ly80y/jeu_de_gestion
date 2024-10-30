@@ -98,9 +98,17 @@ func clean_layout(layout):
 func get_connections(layout,coords:Vector2,type:="road"):#returns the road situations and the facing
 	var x=coords.x
 	var y=coords.y
-	var up=layout[x][y-1]["type"]==type
+	var left=true
+	var up=false
+	if x>0:
+		left=layout[x-1][y]["type"]==type
+	else:
+		left=false
+	if y>0:
+		up=layout[x][y-1]["type"]==type
+	else:
+		up=false
 	var down=layout[x][y+1]["type"]==type
-	var left=layout[x-1][y]["type"]==type
 	var right=layout[x+1][y]["type"]==type
 	var connections="none"
 	var facing="east"
@@ -267,9 +275,13 @@ func set_built_tile(coords,id:int):
 	}
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	mouse_tile_map_pos=local_to_map(get_global_mouse_position())
+	if local_to_map(get_global_mouse_position()).x>0 and local_to_map(get_global_mouse_position()).y>0:
+		mouse_tile_map_pos=local_to_map(get_global_mouse_position())
+	else:
+		mouse_tile_map_pos=Vector2(0,0)
 	if manager.cursor_state=="building_road":
 		connect_road(road_begin,mouse_tile_map_pos,grid,invert_build_path,true)
-	set_layout_on_tilemap(grid)
-	clean_layout(grid)
-	update_grid(grid)
+		set_layout_on_tilemap(grid)
+		clean_layout(grid)
+		update_grid(grid)
+	

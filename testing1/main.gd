@@ -144,7 +144,6 @@ func create_workplace(coords:Vector2,table,type="factory"):
 			"employee_needs":{"farmer":2}
 		}
 	elif type=="shop":
-		var farms =get_nearest_building(get_list_of_type(workplaces,"farm"),coords)
 		workplace_dict={
 			"type":type,
 			"id":generate_id(table),
@@ -153,13 +152,22 @@ func create_workplace(coords:Vector2,table,type="factory"):
 			"inventory":[],
 			"capacity":50,
 			"employee_needs":{"shop_deliverer":1,"retailer":2},
-			"farm":farms[0]
+			"farm":{"type":"nofarm","coords":Vector2(0,0)}
 		}
+		
 	if building_grid.grid[coords.x][coords.y]["type"]=="grass":
 		table.append(workplace_dict)
+		if type=="shop":
+			assign_farm_to_shop(workplace_dict["id"])
 		return 1
 	else:
 		return 0
+func assign_farm_to_shop(shop_id):
+	var shop_index=get_id_index(workplaces,shop_id)
+	var farms =get_nearest_building(get_list_of_type(workplaces,"farm"),workplaces[shop_index]["coords"])
+	if farms!=[]:
+		workplaces[shop_index]["farm"]=farms[0]
+	
 func get_info(table,id,key):
 	if table=="workplaces":
 		return workplaces[get_id_index(workplaces,id)][key]
@@ -235,22 +243,48 @@ func _input(event):
 				building_grid.road_end=building_grid.mouse_tile_map_pos
 				cursor_state="building_road_begin"
 				building_grid.connect_road(building_grid.road_begin,building_grid.road_end,building_grid.grid,building_grid.invert_build_path)
+				
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
+				
 			elif cursor_state=="building_house":
 				create_house(building_grid.mouse_tile_map_pos,houses,building_grid.grid)
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 			elif cursor_state=="spawn_agent":
 				create_agent(building_grid.mouse_tile_map_pos,agents)
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 			elif cursor_state=="building_factory":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces)
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 			elif cursor_state=="building_farm":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces,"farm")
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 			elif cursor_state=="building_shop":
 				create_workplace(building_grid.mouse_tile_map_pos,workplaces,"shop")
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 			elif cursor_state=="delete_building":
 				building_grid.delete_building(building_grid.mouse_tile_map_pos,building_grid.grid)
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 				cursor_state="none"
 			elif cursor_state=="building_station":
 				cursor_state="none"
 				create_station(building_grid.mouse_tile_map_pos,metro_stations)
+				building_grid.update_grid(building_grid.grid)
+				building_grid.clean_layout(building_grid.grid)
+				building_grid.set_layout_on_tilemap(building_grid.grid)
 				
 	elif event is InputEventKey:
 		if event.pressed and event.keycode==KEY_I:
@@ -308,11 +342,19 @@ func _on_build_factory_pressed():
 	
 func _on_delete_button_pressed():
 	cursor_state="delete_building"
-	
+
+func update_workplaces():
+	for i in len(workplaces):
+		if workplaces[i]["type"]=="shop" and workplaces[i]["farm"]=={"type":"nofarm","coords":Vector2(0,0)}:#checks 
+			assign_farm_to_shop(workplaces[i]["id"])
 
 func _on_timer_timeout():
+	building_grid.set_layout_on_tilemap(building_grid.grid)
+	building_grid.clean_layout(building_grid.grid)
+	building_grid.update_grid(building_grid.grid)
 	date["hour"]+=1
 	if date["hour"]>=24:
+		
 		update_agents()
 		date["hour"]=0
 		date["day"]+=1

@@ -236,7 +236,7 @@ func define_workplace(workplace_table):
 						goto_work["coords"]=workplace_coords
 						goto_work["destination_type"]="building"
 						work_task={"type":"work_factory","stop_time":17,"subtasks_loop":[goto_work,wait_1h]}
-					elif ajob=="shop_deliverer":
+					elif ajob=="shop_deliverer" and workplace_table[i]["farm"]["type"]!="nofarm":
 						print("[!]shop deliverer")
 						goto_work["coords"]=workplace_coords
 						goto_work["destination_type"]="outside"
@@ -292,3 +292,4 @@ func get_substract_list(dict1,dict2):#returns a list with a key for dict1 for ea
 func get_jobs_available(workplace_dict):
 	var jobs_dict=get_jobs_dict(workplace_dict["employees"])
 	return get_substract_list(workplace_dict["employee_needs"],jobs_dict)
+	
